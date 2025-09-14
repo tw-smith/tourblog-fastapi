@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    image: tourblog-fastapi
+    ports:
+      - 1337:80
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+
+    volumes:
+      -  ./uploads:/code/app/uploads
+
+
+  postgresdb:
+    image: "postgres:17"
+    hostname: "postgres"
+    environment:
+      POSTGRES_DB: tourblog-fastapi
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -d tourblog-fastapi -U admin
+      interval: 1s
+      retries: 20
+      start_period: 1s
